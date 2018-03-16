@@ -1,51 +1,27 @@
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.*;
 public class RegexGenerator {
-    char ch;
-    Integer frequency;
-
-    public RegexGenerator(char ch, int frequency) {
-        this.ch = ch;
-        this.frequency = frequency;
-    }
-
-    public char getCh() {
-        return ch;
-    }
-
-    public void setCh(char ch) {
-        this.ch = ch;
-    }
-
-    public Integer getFrequency() {
-        return frequency;
-    }
-
-    public void setFrequency(Integer frequency) {
-        this.frequency = frequency;
-    }
-
-    public static List stringToRegex(String string) {
-        String eleje = "";
-        String egyezettKaraktekerSzama = "^";
-        String betuKezdo = "(?=";
-        String betuZaro = ")";
-        char[] charlist = new char[string.length()];
-        string.toLowerCase().getChars(0, string.length(), charlist, 0);
-        List<RegexGenerator> uniqchars = new ArrayList<RegexGenerator>();
+    public static String stringToRegex(String string) {
+        String[] charlist = new String[string.length()];
+        charlist = string.toLowerCase().split("");
+        HashMap<String,Integer> charfreq = new HashMap<>();
         for (int i = 0; i < charlist.length; i++) {
-            if (!uniqchars.contains(charlist[i])) {
-                uniqchars.add(new RegexGenerator(string.charAt(i), 1));
+            if (!charfreq.containsKey(charlist[i])) {
+                charfreq.put(charlist[i], 1);
             } else {
-                uniqchars.indexOf(charlist[i]); //// charlist[i] értékével korábban már indexelt char-hoz tartozó getFrequency-t kéne meghívni?
+                charfreq.put(charlist[i], charfreq.get(charlist[i])+1);
             }
         }
-        for (int i = 0; i < uniqchars.size(); i++) {
-            System.out.println(uniqchars.get(i).getFrequency());
-        }
-
-        return uniqchars;
+        final String[] regexPieces = {"", "^"};
+        charfreq.forEach((k,v) -> {
+            regexPieces[0] += "(?=";
+            for (int i = 0; i < v; i++) {
+                regexPieces[0] += ".*" + k;
+                regexPieces[1] += ".";
+            }
+            regexPieces[0] += ")";
+        });
+        regexPieces[1] += "$";
+        return regexPieces[0]+regexPieces[1];
     }
 }
 
